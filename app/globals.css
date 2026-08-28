@@ -113,3 +113,154 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile gallery — the shutter, on a phone.
+
+   The desktop version pins, and a pin captures scroll. Nothing here
+   does: `position: sticky` never prevents scrolling, and the reveal is
+   driven by a registered custom property that both drivers only ever
+   *write a number* to. There is no path from this code to a trapped
+   finger.
+
+   One design, two drivers:
+     - `animation-timeline: view()` where supported (iOS 26+, ~84%)
+     - a rAF loop setting the same properties everywhere else
+   ───────────────────────────────────────────────────────────── */
+
+/* Registered so it can be animated and so it inherits to the strips.
+   Initial value 1 = fully revealed: if neither driver ever runs, the
+   photographs are simply there. Failure mode is the current site. */
+@property --frame-p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --frame-out {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* The stage is sized from the photograph, not the viewport. A 16:9 frame is
+   only ~211px tall on a 375px phone, so a full-height stage left it floating
+   in ~470px of ground — sparse rather than cinematic. Deriving the height
+   gives a proportionate letterbox on any device, which is how film is
+   presented anyway; the band carries the slate. */
+:root {
+  --shot-h: 56.25vw; /* 16:9 across the full width */
+  --stage-h: calc(var(--shot-h) + 150px);
+  --frame-hold: 15svh; /* extra scroll so each frame holds before releasing */
+}
+
+.gallery-frame {
+  /* Scroll budget per photograph. svh, not dvh: dvh changes as iOS
+     chrome collapses, which would resize a stuck element mid-scroll. */
+  height: calc(var(--stage-h) + var(--frame-hold));
+}
+
+.gallery-stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  height: var(--stage-h);
+  overflow: hidden;
+  background: var(--color-ground);
+}
+
+.gallery-shot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.gallery-shot img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  /* Restrained: 1.06, not the desktop 1.12. A hard push-in on a
+     photograph reads as a slideshow. */
+  transform: scale(calc(1 + (1 - var(--frame-p)) * 0.06));
+  transform-origin: center;
+}
+
+/* Ten strips, matching the desktop stripsCount. Transform-only, so the
+   compositor does the work — a mask gradient driven by a custom property
+   repaints every frame instead. */
+.gallery-strip {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 10.4%;
+  background: var(--color-ground);
+  transform-origin: top;
+  transform: scaleY(
+    clamp(0, calc(1 - (var(--frame-p) * 2.2 - var(--i) * 0.13)), 1)
+  );
+  will-change: transform;
+}
+
+/* The outgoing frame recedes as the next rides over it, so the stack
+   reads as depth rather than a pile. Opacity, not filter: composited. */
+.gallery-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--color-ground);
+  opacity: calc(var(--frame-out) * 0.55);
+  pointer-events: none;
+}
+
+@supports (animation-timeline: view()) {
+  .gallery-frame {
+    animation:
+      frame-reveal linear both,
+      frame-recede linear both;
+    animation-timeline: view(), view();
+    animation-range: entry 5% cover 28%, exit 0% exit 100%;
+  }
+}
+
+@keyframes frame-reveal {
+  from {
+    --frame-p: 0;
+  }
+  to {
+    --frame-p: 1;
+  }
+}
+
+@keyframes frame-recede {
+  from {
+    --frame-out: 0;
+  }
+  to {
+    --frame-out: 1;
+  }
+}
+
+/* Reduced motion collapses to the plain stack this replaced: no sticky
+   hold, no strips, nothing part-drawn. */
+@media (prefers-reduced-motion: reduce) {
+  .gallery-frame {
+    height: auto;
+    animation: none;
+  }
+  .gallery-stage {
+    position: static;
+    height: auto;
+    gap: 12px;
+  }
+  .gallery-strip,
+  .gallery-veil {
+    display: none;
+  }
+  .gallery-shot img {
+    transform: none;
+  }
+}

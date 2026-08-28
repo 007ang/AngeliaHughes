@@ -1,81 +1,102 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useFrameProgress } from "@/hooks/use-frame-progress";
 import type { GalleryImage } from "@/lib/content";
 
+const STRIPS = 10;
+
 /**
- * The server-rendered gallery, and the one mobile and reduced-motion keep.
+ * The server-rendered gallery, and the one phones and reduced-motion keep.
  *
- * Full-bleed width at the photographs' native 16:9 rather than a forced
- * full-height portrait crop: these are pictures of a person, and cropping a
- * landscape still to a phone viewport is what cuts her head off. Frames
- * crossfade in on intersection; under reduced motion they are simply there.
+ * A sticky stack: each photograph holds the screen while the next rides up
+ * over it, revealed by the same ten-strip shutter the desktop version uses.
+ * Nothing here pins. `position: sticky` cannot capture scroll, and the reveal
+ * is driven by a custom property that both drivers only write numbers to — so
+ * the phone can have the signature motion without the trapped-finger failure
+ * that made us leave it off in the first place.
  *
- * No GSAP, no pin, no scroll capture — this is an ordinary document scroll.
+ * Frames sit letterboxed in the ground rather than cropped to fill the screen:
+ * a 16:9 landscape photograph cannot fill a portrait phone without a crop that
+ * would destroy the wide compositions and cut her head off. The ground band
+ * carries the slate instead, which is how a frame is logged on set anyway.
+ *
+ * See globals.css for the motion; reduced motion collapses this back to a
+ * plain stack.
  */
-function Frame({ image, priority }: { image: GalleryImage; priority: boolean }) {
-  const ref = useRef<HTMLElement>(null);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: "10% 0px" },
-    );
-
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
+function Frame({
+  image,
+  index,
+  total,
+  priority,
+}: {
+  image: GalleryImage;
+  index: number;
+  total: number;
+  priority: boolean;
+}) {
   return (
-    <figure ref={ref} className="relative w-full">
-      <div className="relative aspect-video w-full overflow-hidden bg-bone/9">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image.src}
-          srcSet={
-            image.srcMobile
-              ? `${image.srcMobile} 1280w, ${image.src} 1920w`
-              : undefined
-          }
-          sizes="100vw"
-          alt={image.alt}
-          width={1920}
-          height={1080}
-          loading={priority ? "eager" : "lazy"}
-          decoding={priority ? "sync" : "async"}
-          fetchPriority={priority ? "high" : "auto"}
-          data-reveal
-          className="h-full w-full object-cover"
-          style={{
-            opacity: shown ? 1 : 0,
-            transition: "opacity 520ms var(--ease-identity)",
-          }}
-        />
-      </div>
+    <section className="gallery-frame" data-frame>
+      <div className="gallery-stage">
+        <figure className="gallery-shot">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image.src}
+            srcSet={
+              image.srcMobile
+                ? `${image.srcMobile} 1280w, ${image.src} 1920w`
+                : undefined
+            }
+            sizes="100vw"
+            alt={image.alt}
+            width={1920}
+            height={1080}
+            loading={priority ? "eager" : "lazy"}
+            decoding={priority ? "sync" : "async"}
+            fetchPriority={priority ? "high" : "auto"}
+          />
 
-      {image.productionName && (
-        <figcaption className="label px-6 pt-3 text-bone/55 md:px-10">
-          {image.productionName}
+          {Array.from({ length: STRIPS }, (_, i) => (
+            <span
+              key={i}
+              aria-hidden
+              className="gallery-strip"
+              style={
+                {
+                  top: `${i * (100 / STRIPS)}%`,
+                  "--i": i,
+                } as React.CSSProperties
+              }
+            />
+          ))}
+
+          <span aria-hidden className="gallery-veil" />
+        </figure>
+
+        {/* The slate. Uses the letterbox band rather than leaving it empty. */}
+        <figcaption className="label flex w-full items-baseline justify-between gap-6 px-6 text-bone/55">
+          <span className="tnum">
+            {String(index + 1).padStart(2, "0")} / {total}
+          </span>
+          {image.productionName && <span>{image.productionName}</span>}
         </figcaption>
-      )}
-    </figure>
+      </div>
+    </section>
   );
 }
 
 export function GalleryStatic({ images }: { images: GalleryImage[] }) {
+  const ref = useFrameProgress();
+
   return (
-    <div className="flex w-full flex-col gap-4 md:gap-6">
+    <div ref={ref} className="w-full">
       {images.map((image, i) => (
-        <Frame key={image.src} image={image} priority={i < 2} />
+        <Frame
+          key={image.src}
+          image={image}
+          index={i}
+          total={images.length}
+          priority={i < 2}
+        />
       ))}
     </div>
   );
