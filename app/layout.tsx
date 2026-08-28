@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import { SITE } from "@/lib/content";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 /** Archivo carries over from the wordmark. */
@@ -22,19 +23,6 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
   weight: ["400", "500"],
 });
-
-/**
- * Without this, Next resolves og:image against http://localhost:3000 and every
- * shared link ships a broken card. Vercel exposes the production domain at
- * build time; NEXT_PUBLIC_SITE_URL overrides it once a custom domain exists.
- */
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
