@@ -23,7 +23,21 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
+/**
+ * Without this, Next resolves og:image against http://localhost:3000 and every
+ * shared link ships a broken card. Vercel exposes the production domain at
+ * build time; NEXT_PUBLIC_SITE_URL overrides it once a custom domain exists.
+ */
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: `${SITE.name} — Camera Operator · ${SITE.location}`,
   description: SITE.seoDescription,
   openGraph: {

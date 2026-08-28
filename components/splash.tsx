@@ -32,15 +32,26 @@ export function Splash({ name }: { name: string }) {
     if (!el) return;
 
     let done = false;
+    let failsafe = 0;
     const finish = () => {
       if (done) return;
       done = true;
+      window.clearTimeout(failsafe);
       el.style.display = "none";
       document.documentElement.style.removeProperty("overflow");
       // The pinned gallery mounted behind a locked scroll, so its pin length
       // was measured against the wrong page height. Re-measure now.
       ScrollTrigger.refresh();
     };
+
+    /**
+     * The splash is an opaque overlay that only JavaScript can remove, which
+     * makes it a single point of failure for the entire site: if anything
+     * below throws, or the timeline never completes, a visitor gets a black
+     * page and nothing else. So the escape hatch is armed first, before any
+     * animation code runs, and it is unconditional.
+     */
+    failsafe = window.setTimeout(finish, 6000);
 
     // Plays on every load, deliberately. Nobody arrives here for reference —
     // if you reloaded it, you reloaded it to watch this. Reduced motion is a
@@ -54,75 +65,124 @@ export function Splash({ name }: { name: string }) {
     // never measures against a scroll position the visitor did not choose.
     document.documentElement.style.overflow = "hidden";
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ onComplete: finish });
+    let ctx: gsap.Context | undefined;
+    try {
+      ctx = gsap.context(() => {
+        const tl = gsap.timeline({ onComplete: finish });
 
-      // Exposure ramps up from black (identity Motion 01).
-      tl.fromTo(".splash-stage", { opacity: 0 }, { opacity: 1, duration: 0.22, ease: "none" }, 0)
-
-        // The brim draws outward from centre — the spine arrives first.
-        // Driven by a clip rect rather than scaleX: GSAP resolves
-        // transformOrigin percentages against the viewBox on SVG children,
-        // which left the bar translated off centre.
-        .to(".clip-brim", { attr: { x: 13, width: 334 }, duration: 0.3, ease: "power2.out" }, 0.06)
-
-        // The crown resolves upward off the brim, as 01 with its clay band.
-        .to(
-          ".clip-crown",
-          { attr: { y: 8, height: 87 }, duration: 0.4, ease: "power3.out" },
-          0.3,
-        )
-        .fromTo(".splash-band", { opacity: 0 }, { opacity: 1, duration: 0.24 }, 0.42)
-
-        // Detail strips away: 01 → 02. The band opens into a slot.
-        .to(".splash-crown", { morphSVG: CROWN_02, duration: 0.42, ease: "power2.inOut" }, 0.86)
-        .to(".splash-band", { opacity: 0, duration: 0.28 }, 0.86)
-
-        // The hat is wiped by the brim; the monogram grows back out of it.
-        // "The A is the crown" — same geometry, same spine, next state.
-        .to(".clip-crown", { attr: { y: 95, height: 0 }, duration: 0.32, ease: "power2.in" }, 1.3)
-        .to(".clip-mono", { attr: { y: 8, height: 87 }, duration: 0.38, ease: "power3.out" }, 1.5)
-
-        // Rack focus: hunts past sharp, then settles (identity Motion 01).
-        .fromTo(
+        // Exposure ramps up from black (identity Motion 01).
+        tl.fromTo(
           ".splash-stage",
-          { filter: "blur(11px)" },
-          { filter: "blur(0px)", duration: 0.9, ease: "power2.out" },
-          0.3,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.22, ease: "none" },
+          0,
         )
 
-        // Letters resolve — 220ms, identity Motion 03.
-        .fromTo(".splash-word", { opacity: 0 }, { opacity: 1, duration: 0.22 }, 1.78)
+          // The brim draws outward from centre — the spine arrives first.
+          // Driven by a clip rect rather than scaleX: GSAP resolves
+          // transformOrigin percentages against the viewBox on SVG children,
+          // which left the bar translated off centre.
+          .to(
+            ".clip-brim",
+            { attr: { x: 13, width: 334 }, duration: 0.3, ease: "power2.out" },
+            0.06,
+          )
 
-        // Wiped by the brim line: the ground parts along the spine while the
-        // lockup holds, so the mark is still standing there as the gallery
-        // opens behind it. The scrim travels with it — the identity allows
-        // 02/03 over photography only with one — and both dissolve last.
-        .to(".splash-panel-top", { yPercent: -100, duration: 0.6, ease: "power3.inOut" }, 2.3)
-        .to(".splash-panel-bottom", { yPercent: 100, duration: 0.6, ease: "power3.inOut" }, 2.3)
-        .to(
-          [".splash-stage", ".splash-scrim"],
-          { opacity: 0, duration: 0.42, ease: "power2.in" },
-          2.74,
-        );
+          // The crown resolves upward off the brim, as 01 with its clay band.
+          .to(
+            ".clip-crown",
+            { attr: { y: 8, height: 87 }, duration: 0.4, ease: "power3.out" },
+            0.3,
+          )
+          .fromTo(
+            ".splash-band",
+            { opacity: 0 },
+            { opacity: 1, duration: 0.24 },
+            0.42,
+          )
 
-      // Any intent to interact ends it immediately.
-      const skip = () => {
-        tl.progress(1);
-        tl.kill();
-        finish();
-      };
-      for (const evt of ["pointerdown", "keydown", "wheel", "touchstart"] as const) {
-        window.addEventListener(evt, skip, { once: true, passive: true });
-      }
-    }, el);
+          // Detail strips away: 01 → 02. The band opens into a slot.
+          .to(
+            ".splash-crown",
+            { morphSVG: CROWN_02, duration: 0.42, ease: "power2.inOut" },
+            0.86,
+          )
+          .to(".splash-band", { opacity: 0, duration: 0.28 }, 0.86)
+
+          // The hat is wiped by the brim; the monogram grows back out of it.
+          // "The A is the crown" — same geometry, same spine, next state.
+          .to(
+            ".clip-crown",
+            { attr: { y: 95, height: 0 }, duration: 0.32, ease: "power2.in" },
+            1.3,
+          )
+          .to(
+            ".clip-mono",
+            { attr: { y: 8, height: 87 }, duration: 0.38, ease: "power3.out" },
+            1.5,
+          )
+
+          // Rack focus: hunts past sharp, then settles (identity Motion 01).
+          .fromTo(
+            ".splash-stage",
+            { filter: "blur(11px)" },
+            { filter: "blur(0px)", duration: 0.9, ease: "power2.out" },
+            0.3,
+          )
+
+          // Letters resolve — 220ms, identity Motion 03.
+          .fromTo(
+            ".splash-word",
+            { opacity: 0 },
+            { opacity: 1, duration: 0.22 },
+            1.78,
+          )
+
+          // Wiped by the brim line: the ground parts along the spine while the
+          // lockup holds, so the mark is still standing there as the gallery
+          // opens behind it. The scrim travels with it — the identity allows
+          // 02/03 over photography only with one — and both dissolve last.
+          .to(
+            ".splash-panel-top",
+            { yPercent: -100, duration: 0.6, ease: "power3.inOut" },
+            2.3,
+          )
+          .to(
+            ".splash-panel-bottom",
+            { yPercent: 100, duration: 0.6, ease: "power3.inOut" },
+            2.3,
+          )
+          .to(
+            [".splash-stage", ".splash-scrim"],
+            { opacity: 0, duration: 0.42, ease: "power2.in" },
+            2.74,
+          );
+
+        // Any intent to interact ends it immediately.
+        const skip = () => {
+          tl.progress(1);
+          tl.kill();
+          finish();
+        };
+        for (const evt of [
+          "pointerdown",
+          "keydown",
+          "wheel",
+          "touchstart",
+        ] as const) {
+          window.addEventListener(evt, skip, { once: true, passive: true });
+        }
+      }, el);
+    } catch (error) {
+      // Never let a broken animation cost the visitor the whole page.
+      console.error("[splash] animation failed, revealing page:", error);
+      finish();
+    }
 
     return () => {
-      ctx.revert();
+      window.clearTimeout(failsafe);
+      ctx?.revert();
       document.documentElement.style.removeProperty("overflow");
-      // The pinned gallery mounted behind a locked scroll, so its pin length
-      // was measured against the wrong page height. Re-measure now.
-      ScrollTrigger.refresh();
     };
   }, []);
 
@@ -174,10 +234,22 @@ export function Splash({ name }: { name: string }) {
             {/* Every reveal is a rect opening from the brim line — the spine.
                 No transforms, so nothing can drift off centre. */}
             <clipPath id="ah-clip-brim">
-              <rect className="clip-brim" x={180} y={94} width={0} height={22} />
+              <rect
+                className="clip-brim"
+                x={180}
+                y={94}
+                width={0}
+                height={22}
+              />
             </clipPath>
             <clipPath id="ah-clip-crown">
-              <rect className="clip-crown" x={0} y={95} width={360} height={0} />
+              <rect
+                className="clip-crown"
+                x={0}
+                y={95}
+                width={360}
+                height={0}
+              />
             </clipPath>
             <clipPath id="ah-clip-mono">
               <rect className="clip-mono" x={0} y={95} width={360} height={0} />
@@ -186,7 +258,12 @@ export function Splash({ name }: { name: string }) {
 
           <g clipPath="url(#ah-clip-crown)">
             <path className="splash-crown text-bone" d={CROWN_01} />
-            <path className="splash-band" d={BAND_01} fill="#9F4B33" stroke="#9F4B33" />
+            <path
+              className="splash-band"
+              d={BAND_01}
+              fill="#9F4B33"
+              stroke="#9F4B33"
+            />
           </g>
           <g className="text-bone" clipPath="url(#ah-clip-mono)">
             <path d={`${CROWN_03_A} ${H_GROUP}`} />
