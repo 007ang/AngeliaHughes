@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   Angelia Hughes — identity tokens (Rev A → site Rev B)
+   Three values. Everything else is an opacity step of bone,
+   so the palette cannot drift: change the ground and the whole
+   page re-harmonises.
+   ───────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-ground: #16140f; /* warm black — the ground the marks were drawn against */
+  --color-bone: #e8dfd1; /* the felt — text, marks */
+  --color-clay: #9f4b33; /* the band — MARK ONLY, never in the UI */
+
+  --font-display: var(--font-archivo), Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", monospace;
+
+  /* zero radius, everywhere */
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-full: 0px;
+
+  /* motion — identity 03 MINIMAL: rule 260ms, content 220ms */
+  --duration-rule: 260ms;
+  --duration-resolve: 220ms;
+  /* the header mark swap — slower than the page's own moments, because it is
+     an invitation to hover rather than a reveal */
+  --duration-mark: 620ms;
+  --ease-identity: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* section rhythm — 8px grid */
+  --section-pad: clamp(96px, 12vh, 180px);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-ground);
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ground);
+  color: var(--color-bone);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Every figure and metadata label is mono with locked-width digits,
+   so right-aligned columns actually align. */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Wordmark — identity: Archivo medium, uppercase, tracking .30em */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+}
+
+/* Metadata label — identity section headers */
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+::selection {
+  background: rgb(232 223 209 / 0.18);
+  color: var(--color-bone);
+}
+
+:focus-visible {
+  outline: 1px solid rgb(232 223 209 / 0.55);
+  outline-offset: 3px;
+}
+
+/* The page owns its scroll. GSAP's pin needs to scroll within window,
+   so nothing here may introduce a scroll container. */
+html,
+body {
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reveals arrive already resolved rather than mid-animation, so the page
+     reads as finished instead of half-drawn. Inline styles set these, so the
+     override has to win. */
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large image masters — uploaded to Sanity, not served from the repo
+/assets/originals
