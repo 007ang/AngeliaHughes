@@ -13,6 +13,11 @@ import { Mark } from "@/components/mark";
  * IntersectionObserver rather than `animation-timeline: view()` — this is a
  * one-shot, it needs no scroll-linked progress, and it works on every browser
  * instead of the ~84% that have scroll-driven CSS.
+ *
+ * The arrival tip lives on the wrapper and the hover/press tilt on the mark
+ * itself, deliberately. Both on one element and the animation would win the
+ * cascade — `animation-fill-mode: both` holds `rotate` after it finishes, and
+ * hover would silently stop working.
  */
 export function MarkInView({
   className,
@@ -44,7 +49,12 @@ export function MarkInView({
 
   return (
     <div ref={ref} className="mark-tips-in" data-in-view={seen}>
-      <Mark variant="01" fullColour className={className} title={title} />
+      <Mark
+        variant="01"
+        fullColour
+        className={`origin-[50%_86.25%] transition-[rotate] duration-[var(--duration-mark)] ease-identity motion-safe:hover:-rotate-6 motion-safe:active:-rotate-6 ${className ?? ""}`}
+        title={title}
+      />
     </div>
   );
 }

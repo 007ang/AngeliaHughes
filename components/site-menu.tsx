@@ -78,8 +78,13 @@ export function SiteMenu({ items }: { items: MenuItem[] }) {
 
   return (
     <>
-      {/* Desktop: the links themselves. */}
-      <nav aria-label="Main" className="hidden md:block">
+      {/* Desktop: the links themselves.
+          `pointer-events-auto` lives here rather than on a wrapper in the
+          header. The header is pointer-events-none so the scrim never eats
+          clicks, and this component renders three siblings out of a fragment —
+          relying on a parent to re-enable them meant one lost wrapper silently
+          killed every desktop menu click. Each root now owns it. */}
+      <nav aria-label="Main" className="pointer-events-auto hidden md:block">
         <ul className="flex items-center gap-8">
           {items.map((item) => (
             <li key={item.label}>
