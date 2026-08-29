@@ -6,20 +6,21 @@
  * Every figure here is from IMDb (Rev B spec). Do not round, pad, or invent.
  */
 
-export type Department = {
+export type SelectedCredit = {
   _id?: string;
-  label: string;
-  count: number;
+  title: string;
+  role: string;
+  year?: string;
+  note?: string;
   order: number;
 };
 
-export type Upcoming = {
+export type WorkVideo = {
   _id?: string;
   title: string;
-  format?: string;
-  episodes?: string;
-  roles: string;
-  status: string;
+  url: string;
+  provider?: string;
+  year?: string;
   order: number;
 };
 
@@ -41,6 +42,8 @@ export type SiteSettings = {
   imdbUrl: string;
   linkedinUrl: string;
   seoDescription: string;
+  /** Paragraphs. Written by her — never invented here. */
+  bio: string[];
 };
 
 /**
@@ -58,60 +61,71 @@ export const SITE: SiteSettings = {
   linkedinUrl: "https://ca.linkedin.com/in/angelia-hughes-abb02538",
   seoDescription:
     "Angelia Hughes is a camera operator and director based in Toronto. Forty camera and electrical credits across television and film, with work in writing, editing, production and visual effects.",
+
+  /**
+   * DRAFT — NOT APPROVED. Assembled only from facts already verified against
+   * her IMDb profile: location, role, the department counts, and the four 2026
+   * titles. Nothing here is invented, and nothing here should go live until
+   * Angelia has read and corrected it. Replace via Sanity.
+   *
+   * It also carries the site's SEO weight now that the credit tables are gone,
+   * so "camera operator", "director" and "Toronto" need to survive any rewrite.
+   */
+  bio: [
+    "Angelia Hughes is a camera operator and director based in Toronto.",
+    "Her forty credits across camera and electrical departments span television and film. Alongside them she has worked as a writer, editor, producer, visual effects artist and actor.",
+    "She is currently operating on four productions in post-production for 2026.",
+  ],
 };
 
 /**
- * The centrepiece. Eight rows, set at ONE size.
- * The 40 is credibility; the seven singles are the case for directing.
- * The argument is the spread, not the total — never make the 40 large.
+ * Written out rather than tabulated — a table of these reads as IMDb, which is
+ * exactly the note. Placeholder curation: these are the four 2026 titles we
+ * hold, not a selection Angelia has made.
  */
-export const DEPARTMENTS: Department[] = [
-  { label: "Camera and Electrical", count: 40, order: 1 },
-  { label: "Director", count: 1, order: 2 },
-  { label: "Writer", count: 1, order: 3 },
-  { label: "Editor", count: 1, order: 4 },
-  { label: "Actress", count: 1, order: 5 },
-  { label: "Production Management", count: 1, order: 6 },
-  { label: "Visual Effects", count: 1, order: 7 },
-  { label: "Additional Crew", count: 1, order: 8 },
-];
-
-/** All 2026, all in post. "Post-production" reads as working right now. */
-export const UPCOMING: Upcoming[] = [
+export const SELECTED_CREDITS: SelectedCredit[] = [
   {
     title: "Below",
-    format: "TV Mini Series",
-    episodes: "4 eps",
-    roles: "'a' / 'b' camera operator",
-    status: "Completed",
+    role: "'a' / 'b' camera operator",
+    year: "2026",
+    note: "TV mini series",
     order: 1,
   },
   {
     title: "The Greatest",
-    format: "TV Series",
-    episodes: "8 eps",
-    roles: "'b' camera, 'a' camera second unit",
-    status: "Post-production",
+    role: "'b' camera, 'a' camera second unit",
+    year: "2026",
+    note: "TV series",
     order: 2,
   },
   {
     title: "The Body",
-    format: "TV Series",
-    episodes: "8 eps",
-    roles: "'a' camera operator",
-    status: "Post-production",
+    role: "'a' camera operator",
+    year: "2026",
+    note: "TV series",
     order: 3,
   },
   {
     title: "Kiss of Death",
-    roles: "'a' camera operator",
-    status: "Post-production",
+    role: "'a' camera operator",
+    year: "2026",
     order: 4,
   },
 ];
 
 /**
- * Ten frames, ordered by editorial strength — the opening frames carry the
+ * Empty until she sends links. The Work section renders an honest empty state
+ * rather than a fabricated reel.
+ */
+export const WORK_VIDEOS: WorkVideo[] = [];
+
+/**
+ * Four frames, down from ten — "I def don't need all those photos". These four
+ * survive because every one of them shows her *operating*; the lifestyle
+ * frames do not serve the case for directing. The remaining eight stay in
+ * /public/gallery so any of them can be swapped back in from Sanity.
+ *
+ * Ordered by editorial strength — the opening frames carry the
  * most weight and the first two are preloaded.
  *
  * Cropped to 1920x1080 from EXIF-corrected masters in /assets/originals, each
@@ -148,40 +162,12 @@ export const GALLERY: GalleryImage[] = [
     alt: "Angelia Hughes in her flat-brim hat watching a take from beside the camera, the actor visible on the monitor.",
     order: 4,
   },
-  {
-    src: "/gallery/05-on-set-interview-1920.jpg",
-    srcMobile: "/gallery/05-on-set-interview-1280.jpg",
-    alt: "Angelia Hughes operating a camera on an interior set while three seated subjects are filmed.",
-    order: 5,
-  },
-  {
-    src: "/gallery/06-period-interior-1920.jpg",
-    srcMobile: "/gallery/06-period-interior-1280.jpg",
-    alt: "Angelia Hughes lining up a shot on a large camera rig inside a period interior.",
-    order: 6,
-  },
-  {
-    src: "/gallery/07-portrait-tree-1920.jpg",
-    srcMobile: "/gallery/07-portrait-tree-1280.jpg",
-    alt: "Portrait of Angelia Hughes in a wide-brimmed hat, leaning against a tree in winter woodland.",
-    order: 7,
-  },
-  {
-    src: "/gallery/08-winter-bench-1920.jpg",
-    srcMobile: "/gallery/08-winter-bench-1280.jpg",
-    alt: "Angelia Hughes seated on a park bench in the snow, wearing a wide-brimmed hat and winter coat.",
-    order: 8,
-  },
-  {
-    src: "/gallery/09-location-helicopter-1920.jpg",
-    srcMobile: "/gallery/09-location-helicopter-1280.jpg",
-    alt: "Angelia Hughes on a remote location shoot, standing with camera gear beside a helicopter.",
-    order: 9,
-  },
-  {
-    src: "/gallery/10-studio-floor-1920.jpg",
-    srcMobile: "/gallery/10-studio-floor-1280.jpg",
-    alt: "A television studio floor during setup, with crew, lighting and camera positions.",
-    order: 10,
-  },
 ];
+
+/** The one true portrait of the ten, and the only one not shot on a set. */
+export const PORTRAIT: GalleryImage = {
+  src: "/gallery/07-portrait-tree-1920.jpg",
+  srcMobile: "/gallery/07-portrait-tree-1280.jpg",
+  alt: "Portrait of Angelia Hughes in a wide-brimmed hat, leaning against a tree in winter woodland.",
+  order: 1,
+};

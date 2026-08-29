@@ -1,35 +1,35 @@
 import { client } from "@/sanity/client";
 import { galleryUrl } from "@/sanity/image";
 import {
-  departmentsQuery,
   galleryQuery,
+  selectedCreditsQuery,
   siteSettingsQuery,
-  upcomingQuery,
+  workVideosQuery,
 } from "@/sanity/queries";
 import {
-  DEPARTMENTS,
   GALLERY,
+  SELECTED_CREDITS,
   SITE,
-  UPCOMING,
-  type Department,
+  WORK_VIDEOS,
   type GalleryImage,
+  type SelectedCredit,
   type SiteSettings,
-  type Upcoming,
+  type WorkVideo,
 } from "@/lib/content";
 
 export type SiteContent = {
   site: SiteSettings;
   gallery: GalleryImage[];
-  departments: Department[];
-  upcoming: Upcoming[];
+  credits: SelectedCredit[];
+  videos: WorkVideo[];
   source: "sanity" | "fallback";
 };
 
 const FALLBACK: SiteContent = {
   site: SITE,
   gallery: GALLERY,
-  departments: DEPARTMENTS,
-  upcoming: UPCOMING,
+  credits: SELECTED_CREDITS,
+  videos: WORK_VIDEOS,
   source: "fallback",
 };
 
@@ -51,11 +51,11 @@ export async function getSiteContent(): Promise<SiteContent> {
   if (!client) return FALLBACK;
 
   try {
-    const [site, gallery, departments, upcoming] = await Promise.all([
+    const [site, gallery, credits, videos] = await Promise.all([
       client.fetch<Partial<SiteSettings> | null>(siteSettingsQuery),
       client.fetch<SanityGalleryDoc[]>(galleryQuery),
-      client.fetch<Department[]>(departmentsQuery),
-      client.fetch<Upcoming[]>(upcomingQuery),
+      client.fetch<SelectedCredit[]>(selectedCreditsQuery),
+      client.fetch<WorkVideo[]>(workVideosQuery),
     ]);
 
     return {
@@ -72,8 +72,10 @@ export async function getSiteContent(): Promise<SiteContent> {
             order: doc.order ?? i + 1,
           }))
         : FALLBACK.gallery,
-      departments: departments?.length ? departments : FALLBACK.departments,
-      upcoming: upcoming?.length ? upcoming : FALLBACK.upcoming,
+      credits: credits?.length ? credits : FALLBACK.credits,
+      // Videos are genuinely empty until she sends links — an empty result here
+      // means "none yet", not "CMS not set up", so it must not fall back.
+      videos: videos ?? [],
       source: "sanity",
     };
   } catch (error) {

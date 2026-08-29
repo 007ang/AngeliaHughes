@@ -3,7 +3,7 @@ import { defineField, defineType } from "sanity";
 /**
  * Deliberately thin: flat fields, no references, no derived computation.
  * The requirement is that she can change a caption, swap a photograph or add
- * an upcoming title without calling anyone. That is the whole bar.
+ * a credit without calling anyone. That is the whole bar.
  */
 
 const siteSettings = defineType({
@@ -33,6 +33,14 @@ const siteSettings = defineType({
       title: "SEO description",
       type: "text",
       rows: 3,
+    }),
+    defineField({
+      name: "bio",
+      title: "Bio",
+      type: "array",
+      of: [{ type: "text", rows: 4 }],
+      description:
+        "One entry per paragraph. This is the main text search engines read, so keep 'camera operator', 'director' and 'Toronto' in it.",
     }),
   ],
   preview: { select: { title: "name", subtitle: "roleLine" } },
@@ -79,52 +87,48 @@ const galleryImage = defineType({
   },
 });
 
-const department = defineType({
-  name: "department",
-  title: "Department",
-  type: "document",
-  fields: [
-    defineField({ name: "label", title: "Department", type: "string" }),
-    defineField({
-      name: "count",
-      title: "Credits",
-      type: "number",
-      validation: (rule) => rule.required().min(0).integer(),
-    }),
-    defineField({ name: "order", title: "Order", type: "number" }),
-  ],
-  preview: { select: { title: "label", subtitle: "count" } },
-});
-
-const upcoming = defineType({
-  name: "upcoming",
-  title: "Upcoming",
+const selectedCredit = defineType({
+  name: "selectedCredit",
+  title: "Selected credit",
   type: "document",
   fields: [
     defineField({ name: "title", title: "Title", type: "string" }),
     defineField({
-      name: "format",
-      title: "Format",
+      name: "role",
+      title: "Role",
       type: "string",
-      description: "e.g. TV Series, TV Mini Series",
+      description: "e.g. 'a' camera operator",
     }),
+    defineField({ name: "year", title: "Year", type: "string" }),
     defineField({
-      name: "episodes",
-      title: "Episodes",
+      name: "note",
+      title: "Note",
       type: "string",
-      description: "e.g. 8 eps",
-    }),
-    defineField({ name: "roles", title: "Role", type: "string" }),
-    defineField({
-      name: "status",
-      title: "Status",
-      type: "string",
-      description:
-        "Shown verbatim. 'Post-production' reads as working right now.",
+      description: "e.g. TV series. Keep it short — a long note reads as IMDb.",
     }),
     defineField({ name: "order", title: "Order", type: "number" }),
   ],
-  preview: { select: { title: "title", subtitle: "status" } },
+  preview: { select: { title: "title", subtitle: "role" } },
 });
 
-export const schemaTypes = [siteSettings, galleryImage, department, upcoming];
+const workVideo = defineType({
+  name: "workVideo",
+  title: "Work — video",
+  type: "document",
+  fields: [
+    defineField({ name: "title", title: "Title", type: "string" }),
+    defineField({
+      name: "url",
+      title: "Link",
+      type: "url",
+      description: "Vimeo, YouTube, or anywhere the piece can be watched.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({ name: "provider", title: "Where", type: "string" }),
+    defineField({ name: "year", title: "Year", type: "string" }),
+    defineField({ name: "order", title: "Order", type: "number" }),
+  ],
+  preview: { select: { title: "title", subtitle: "year" } },
+});
+
+export const schemaTypes = [siteSettings, galleryImage, selectedCredit, workVideo];

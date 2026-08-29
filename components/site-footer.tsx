@@ -1,4 +1,5 @@
-import { Mark } from "@/components/mark";
+import { MarkInView } from "@/components/mark-in-view";
+import { SocialLinks } from "@/components/social-links";
 import type { SiteSettings } from "@/lib/content";
 
 /** Mark, year, done. The short name is the identity's end-card signoff. */
@@ -11,19 +12,16 @@ export function SiteFooter({ site }: { site: SiteSettings }) {
           {/* The identity's own end card. 01 is hero use and needs 96px of width —
               at a 3:1 mark space that is 32px tall, so h-9 clears it. This is
               the one place clay appears on the site. */}
-          {/* Tips on hover like the header mark, and about the same point: the
-              brim bar, which is identical across all three marks and is the
-              identity's motion spine. Self-hover rather than group-hover —
-              there is no second mark to swap to down here. */}
-          <Mark
-            variant="01"
-            fullColour
-            className="h-9 w-auto origin-[50%_86.25%] transition-[rotate] duration-[var(--duration-mark)] ease-identity motion-safe:hover:-rotate-6"
-            title={site.name}
-          />
-          <p className="label text-bone/55">
-            {site.shortName} · {new Date().getFullYear()}
-          </p>
+          {/* Tips itself when you reach it — the hover version of this moment is
+              unreachable with a thumb, and the footer is the end card, so a
+              hat tip is the right gesture on arrival. */}
+          <MarkInView className="h-9 w-auto" title={site.name} />
+          <div className="flex flex-col items-end gap-4">
+            <SocialLinks site={site} />
+            <p className="label text-bone/55">
+              {site.shortName} · {new Date().getFullYear()}
+            </p>
+          </div>
         </div>
       </div>
     </footer>

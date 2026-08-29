@@ -35,8 +35,11 @@
 }
 
 :root {
-  /* section rhythm — 8px grid */
-  --section-pad: clamp(96px, 12vh, 180px);
+  /* Section rhythm — 8px grid. Tightened from the spec's
+     clamp(96px,12vh,180px): that was tuned for a twelve-screen page, and on
+     the scaled-back structure it left ~360px of ground between sections,
+     which reads as emptiness rather than air. */
+  --section-pad: clamp(72px, 9vh, 132px);
 }
 
 html {
@@ -262,5 +265,65 @@ body {
   }
   .gallery-shot img {
     transform: none;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   Touch equivalents for the hover moments.
+
+   Tailwind wraps every `hover:` in @media (hover:hover), so on a phone
+   the mark swap and the hat tip simply did not exist — on the surface
+   most people actually use. Three replacements, none of which need a
+   pointer:
+
+     1. :active — a finger held down is the honest analogue of hover,
+        and it is applied alongside every hover state in the components.
+     2. The footer mark tips itself when it scrolls into view.
+     3. The header mark becomes the hat while the menu is open.
+   ───────────────────────────────────────────────────────────── */
+
+/* 2 — an actual hat tip on arrival at the end card. Tips and returns,
+   because a tip is a greeting, not a new resting state. */
+@keyframes hat-tip {
+  0% {
+    rotate: 0deg;
+  }
+  38% {
+    rotate: -6deg;
+  }
+  100% {
+    rotate: 0deg;
+  }
+}
+
+.mark-tips-in {
+  transform-origin: 50% 86.25%; /* the brim bar — the identity's spine */
+}
+
+.mark-tips-in[data-in-view="true"] {
+  animation: hat-tip 1100ms var(--ease-identity) both;
+}
+
+/* 3 — while the menu is open the monogram becomes the hat, tipped. This is
+   the 03 → 02 swap that hover gives a desktop visitor, tied instead to a
+   state a thumb can actually reach. */
+:root[data-menu-open] .site-mark-rest {
+  opacity: 0;
+}
+
+:root[data-menu-open] .site-mark-alt {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-menu-open] .site-mark-alt {
+    rotate: -6deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark-tips-in[data-in-view="true"] {
+    animation: none;
   }
 }

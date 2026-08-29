@@ -1,19 +1,19 @@
 import ReactDOM from "react-dom";
 import { SiteHeader } from "@/components/site-header";
-import { Splash } from "@/components/splash";
 import { SiteFooter } from "@/components/site-footer";
+import { Splash } from "@/components/splash";
 import { Section } from "@/components/section";
 import { Gallery } from "@/components/gallery/gallery";
-import { Departments } from "@/components/departments";
-import { Upcoming } from "@/components/upcoming";
-import { Contact } from "@/components/contact";
+import { About } from "@/components/about";
+import { Work } from "@/components/work";
 import { getSiteContent } from "@/lib/data";
+import { PORTRAIT } from "@/lib/content";
 
 /** She edits in the Studio; the page picks it up within the minute. */
 export const revalidate = 60;
 
 export default async function Home() {
-  const { site, gallery, departments, upcoming } = await getSiteContent();
+  const { site, gallery, credits, videos } = await getSiteContent();
 
   const images = [...gallery].sort((a, b) => a.order - b.order);
 
@@ -26,35 +26,26 @@ export default async function Home() {
   return (
     <>
       {/* Overlay only — the page below renders fully server-side, so the splash
-          never gates content. Self-dismisses, skippable, once per session. */}
+          never gates content. Self-dismisses, skippable. */}
       <Splash name={site.name} />
 
       <SiteHeader site={site} />
 
       <main id="top">
-        {/* Section 1 — Gallery.
-            Must sit at the root scroll level: GSAP's pin scrolls within
+        {/* Must sit at the root scroll level: GSAP's pin scrolls within
             `window`. Do not wrap this in a smooth-scroll or transformed
             container. */}
         <Gallery images={images} />
 
-        {/* Section 2 — Departments. The page's centrepiece. */}
-        <Section id="departments" label="Departments">
-          <Departments departments={departments} />
+        <Section id="about" label="About">
+          <About site={site} portrait={PORTRAIT} />
         </Section>
 
-        {/* Section 3 — Upcoming. */}
-        <Section id="upcoming" label="Upcoming">
-          <Upcoming items={upcoming} />
-        </Section>
-
-        {/* Section 4 — Contact. */}
-        <Section id="contact" label="Contact">
-          <Contact site={site} />
+        <Section id="work" label="Work">
+          <Work credits={credits} videos={videos} />
         </Section>
       </main>
 
-      {/* Section 5 — Footer. */}
       <SiteFooter site={site} />
     </>
   );
