@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 import { Photo } from "@/components/og/photo";
 import { SITE } from "@/lib/content";
 
-export const alt = `${SITE.name} — Camera Operator · ${SITE.location}`;
+export const alt = `${SITE.name} — Filmmaker · ${SITE.location}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

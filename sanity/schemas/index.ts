@@ -22,7 +22,7 @@ const siteSettings = defineType({
       title: "Role line",
       type: "string",
       description:
-        "Matches IMDb. Do not use 'Cinematographer' or 'Director of Photography' — the credits do not support either.",
+        "How she is described on the OG card. Avoid 'Cinematographer' or 'Director of Photography' — the credits do not support either.",
     }),
     defineField({ name: "location", title: "Location", type: "string" }),
     defineField({ name: "email", title: "Email", type: "string" }),

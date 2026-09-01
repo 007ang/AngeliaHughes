@@ -26,10 +26,10 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: `${SITE.name} — Camera Operator · ${SITE.location}`,
+  title: `${SITE.name} — Filmmaker · ${SITE.location}`,
   description: SITE.seoDescription,
   openGraph: {
-    title: `${SITE.name} — Camera Operator · ${SITE.location}`,
+    title: `${SITE.name} — Filmmaker · ${SITE.location}`,
     description: SITE.seoDescription,
     type: "profile",
     locale: "en_CA",
@@ -53,7 +53,10 @@ function PersonJsonLd() {
     "@type": "Person",
     name: SITE.name,
     alternateName: "Angela Hughes",
-    jobTitle: ["Camera Operator", "Director"],
+    // Leads with how she describes herself. The credited roles stay as
+    // secondary structured data — invisible to visitors, but they keep her
+    // matching a search for "Angelia Hughes camera operator".
+    jobTitle: ["Filmmaker", "Camera Operator", "Director"],
     description: SITE.seoDescription,
     address: {
       "@type": "PostalAddress",

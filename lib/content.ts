@@ -54,13 +54,13 @@ export type SiteSettings = {
 export const SITE: SiteSettings = {
   name: "Angelia Hughes",
   shortName: "Angie Hughes",
-  roleLine: "Camera Operator / Director",
+  roleLine: "Filmmaker",
   location: "Toronto",
   email: "Hughes.angelia@gmail.com",
   imdbUrl: "https://www.imdb.com/name/nm4277983/",
   linkedinUrl: "https://ca.linkedin.com/in/angelia-hughes-abb02538",
   seoDescription:
-    "Angelia Hughes is a camera operator and director based in Toronto. Forty camera and electrical credits across television and film, with work in writing, editing, production and visual effects.",
+    "Angelia Hughes is a filmmaker based in Toronto. Forty camera and electrical credits across television and film, with work in directing, writing, editing, production and visual effects.",
 
   /**
    * DRAFT — NOT APPROVED. Assembled only from facts already verified against
@@ -72,7 +72,7 @@ export const SITE: SiteSettings = {
    * so "camera operator", "director" and "Toronto" need to survive any rewrite.
    */
   bio: [
-    "Angelia Hughes is a camera operator and director based in Toronto.",
+    "Angelia Hughes is a filmmaker based in Toronto.",
     "Her forty credits across camera and electrical departments span television and film. Alongside them she has worked as a writer, editor, producer, visual effects artist and actor.",
     "She is currently operating on four productions in post-production for 2026.",
   ],
