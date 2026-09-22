@@ -17,7 +17,7 @@ import type { SiteSettings } from "@/lib/content";
 export function SiteHeader({ site }: { site: SiteSettings }) {
   const menuItems: MenuItem[] = [
     { label: "About", href: "#about" },
-    { label: "Work", href: "#work" },
+    { label: "Selected Work", href: "#work" },
     { label: "Contact", href: `mailto:${site.email}` },
     { label: "IMDb", href: site.imdbUrl, external: true },
   ];

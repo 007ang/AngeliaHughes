@@ -41,7 +41,7 @@ export default async function Home() {
           <About site={site} portrait={PORTRAIT} />
         </Section>
 
-        <Section id="work" label="Work">
+        <Section id="work" label="Selected Work">
           <Work credits={credits} videos={videos} />
         </Section>
       </main>
