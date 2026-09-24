@@ -56,7 +56,14 @@ function PersonJsonLd() {
     // Leads with how she describes herself. The credited roles stay as
     // secondary structured data — invisible to visitors, but they keep her
     // matching a search for "Angelia Hughes camera operator".
-    jobTitle: ["Filmmaker", "Camera Operator", "Director"],
+    jobTitle: [
+      "Filmmaker",
+      "Director",
+      "Creative Director",
+      "Head of Production",
+      "Cinematographer",
+      "Camera Operator",
+    ],
     description: SITE.seoDescription,
     address: {
       "@type": "PostalAddress",

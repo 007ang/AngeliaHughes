@@ -3,15 +3,22 @@
  * Sanity overrides these at request time; if a fetch fails or a document is
  * missing, the site still ships the real credits rather than an empty frame.
  *
- * Every figure here is from IMDb (Rev B spec). Do not round, pad, or invent.
+ * Bio and selected credits are Angelia's own copy, supplied 2026-09-24.
+ * Do not reword her voice, and do not invent a credit she did not list.
  */
 
 export type SelectedCredit = {
   _id?: string;
   title: string;
   role: string;
+  /** TV Series, Mini Series, Feature. */
+  format?: string;
+  /** Netflix, Blumhouse, Paramount / Prime Video. */
+  studio?: string;
+  /** "Ep. 1–8", "S2 & S3". */
+  episodes?: string;
+  /** She supplied none; kept so she can add them in Sanity without a deploy. */
   year?: string;
-  note?: string;
   order: number;
 };
 
@@ -47,9 +54,9 @@ export type SiteSettings = {
 };
 
 /**
- * Role line matches IMDb exactly and supports the transition she is making.
- * Not "Cinematographer", not "Director of Photography" — nothing in her
- * credits supports either, and Toronto's camera community would notice.
+ * The old rule here was that we must never assign her "Cinematographer" — her
+ * IMDb credits did not support it. That rule governed titles *we* chose. Her
+ * own bio now claims the title directly, which is hers to claim, so it stands.
  */
 export const SITE: SiteSettings = {
   name: "Angelia Hughes",
@@ -60,62 +67,85 @@ export const SITE: SiteSettings = {
   imdbUrl: "https://www.imdb.com/name/nm4277983/",
   linkedinUrl: "https://ca.linkedin.com/in/angelia-hughes-abb02538",
   seoDescription:
-    "Angelia Hughes is a filmmaker based in Toronto. Forty camera and electrical credits across television and film, with work in directing, writing, editing, production and visual effects.",
+    "Angelia Hughes is a Toronto filmmaker with fifteen years on set \u2014 Director, Creative Director, Head of Production, Cinematographer and Camera Operator for Netflix, Paramount, Prime Video and Blumhouse.",
 
   /**
-   * DRAFT — NOT APPROVED. Assembled only from facts already verified against
-   * her IMDb profile: location, role, the department counts, and the four 2026
-   * titles. Nothing here is invented, and nothing here should go live until
-   * Angelia has read and corrected it. Replace via Sanity.
-   *
-   * It also carries the site's SEO weight now that the credit tables are gone,
-   * so "camera operator", "director" and "Toronto" need to survive any rewrite.
+   * Angelia's own words, supplied 2026-09-24. Only mechanical slips were
+   * corrected \u2014 "talent"\u2192"talented", "thats"\u2192"that's", "Thought"\u2192"Though", a
+   * stray capital, "in-front of", and a doubled "Paramount". Her voice,
+   * sentence structure and word choices are untouched. Every further edit
+   * belongs to her, via Sanity.
    */
   bio: [
-    "Angelia Hughes is a filmmaker based in Toronto.",
-    "Her forty credits across camera and electrical departments span television and film. Alongside them she has worked as a writer, editor, producer, visual effects artist and actor.",
-    "She is currently operating on four productions in post-production for 2026.",
+    "Angelia is a talented creative that has proven herself as a notably valuable asset on every production. She goes beyond her role behind the lens, with energy and passion that's hard to match, but is certainly infectious. She's an ambitious team-player that thinks outside the box, learns fast, challenges to be creative while keeping story as the focal point and knows when to pivot.",
+    "Hughes started her TV journey in front of the camera, as a sports show host. Though she loved engaging with guests, she knew it was paramount as a leader to be well-rounded, and set out to become just as strong behind the camera as she was in front of it.",
+    "Hughes has extensive production experience, both in front of and behind the camera and has held the titles of Director, Creative Director, Head of Production, Cinematographer and Camera Operator. Working on Film and TV shows for Netflix, Paramount, Prime Video and Blumhouse.",
+    "After 15 years of working on set, she's taking all that she's learnt and building her Director reel.",
+    "When she's not on set, she's refilling her creative cup, exploring different countries, hiking mountains, chasing plastic, trying new workout classes and exercising her writing chops in cute cafes.",
   ],
 };
 
 /**
- * Written out rather than tabulated — a table of these reads as IMDb, which is
- * exactly the note. Placeholder curation: these are the four 2026 titles we
- * hold, not a selection Angelia has made.
+ * Her curation, in her order, headed "Selected Credits \u2014 Camera". These are
+ * camera credits specifically \u2014 the directing reel she mentions in the bio
+ * does not exist yet \u2014 so the section keeps that qualifier.
+ *
+ * Episode and season strings are normalised for typography only
+ * ("Ep 3,4,5" \u2192 "Ep. 3, 4, 5"); no credit was altered.
  */
 export const SELECTED_CREDITS: SelectedCredit[] = [
   {
-    title: "Below",
-    role: "'a' / 'b' camera operator",
-    year: "2026",
-    note: "TV mini series",
+    title: "The Body",
+    role: "A Camera",
+    format: "TV Series",
+    studio: "Netflix",
+    episodes: "Ep. 1\u20138",
     order: 1,
   },
   {
-    title: "The Greatest",
-    role: "'b' camera, 'a' camera second unit",
-    year: "2026",
-    note: "TV series",
+    title: "Below",
+    role: "A Camera",
+    format: "Mini Series",
+    studio: "Netflix",
+    episodes: "Ep. 3, 4, 5",
     order: 2,
   },
   {
-    title: "The Body",
-    role: "'a' camera operator",
-    year: "2026",
-    note: "TV series",
+    title: "The Last Kiss",
+    role: "A Camera",
+    format: "Feature",
+    studio: "Blumhouse",
     order: 3,
   },
   {
-    title: "Kiss of Death",
-    role: "'a' camera operator",
-    year: "2026",
+    title: "Cross",
+    role: "A Camera 2nd Unit / B Camera",
+    format: "TV Series",
+    studio: "Paramount / Prime Video",
+    episodes: "S2 & S3",
     order: 4,
+  },
+  {
+    title: "The Greatest",
+    role: "A Camera 2nd Unit / B Camera",
+    format: "TV Series",
+    studio: "Amazon",
+    episodes: "S1",
+    order: 5,
+  },
+  {
+    title: "A Merry Little Ex-Mas",
+    role: "B Camera",
+    format: "Feature",
+    studio: "Netflix",
+    order: 6,
   },
 ];
 
 /**
- * Empty until she sends links. The Work section renders an honest empty state
- * rather than a fabricated reel.
+ * Still empty, and now we know why: her bio says she is "building her Director
+ * reel". So this is a true state, not a missing asset \u2014 the Work section shows
+ * credits alone until there is something real to link.
  */
 export const WORK_VIDEOS: WorkVideo[] = [];
 

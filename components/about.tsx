@@ -1,9 +1,10 @@
 import type { GalleryImage, SiteSettings } from "@/lib/content";
 
 /**
- * Bio and portrait. This is now the site's primary indexable text — the credit
- * tables that used to carry that weight are gone — so the copy needs to keep
- * "camera operator", "director" and "Toronto" in it through any rewrite.
+ * Bio and portrait. This is the site's primary indexable text now that the
+ * credit tables are gone, and her own copy happens to carry it well: every
+ * title she claims plus Netflix, Paramount, Prime Video and Blumhouse. Worth
+ * protecting if the copy is ever rewritten.
  */
 export function About({
   site,
@@ -29,7 +30,17 @@ export function About({
         )}
       </div>
 
-      <figure className="md:col-span-5 md:order-2">
+      {/*
+        Travels with the bio rather than ending two paragraphs early.
+
+        `self-start` is load-bearing: a grid item stretches to the row height by
+        default, which leaves sticky nothing to travel within and silently does
+        nothing. Sticky only — no scroll listener, so it costs nothing and is
+        unaffected by reduced motion, which is a layout preference this is not.
+
+        top-24 clears the 72px fixed header (md:py-5 twice + md:h-8) with air.
+      */}
+      <figure className="md:sticky md:top-24 md:col-span-5 md:order-2 md:self-start">
         <div className="aspect-[4/5] w-full overflow-hidden bg-bone/9">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

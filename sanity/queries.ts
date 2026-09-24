@@ -9,7 +9,7 @@ export const galleryQuery = groq`*[_type == "galleryImage"] | order(order asc){
 }`;
 
 export const selectedCreditsQuery = groq`*[_type == "selectedCredit"] | order(order asc){
-  _id, title, role, year, note, order
+  _id, title, role, format, studio, episodes, year, order
 }`;
 
 export const workVideosQuery = groq`*[_type == "workVideo"] | order(order asc){
