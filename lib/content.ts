@@ -129,8 +129,8 @@ export const SELECTED_CREDITS: SelectedCredit[] = [
     title: "The Greatest",
     role: "A Camera 2nd Unit / B Camera",
     format: "TV Series",
-    studio: "Amazon",
-    episodes: "S1",
+    studio: "Prime Video",
+    episodes: "S1, Ep. 1\u20138",
     order: 5,
   },
   {
@@ -169,6 +169,21 @@ export const WORK_VIDEOS: WorkVideo[] = [];
  */
 export const GALLERY: GalleryImage[] = [
   {
+    /**
+     * Toned warm monochrome at her request — the site is otherwise nearly all
+     * monochrome and the colour original sat apart from it. Neutral greyscale
+     * read cold against the warm ground, and a full ground-to-bone duotone
+     * lifted the blacks until the frame went hazy, so this is greyscale tinted
+     * along the identity's warm axis: full contrast, bone-leaning highlights.
+     *
+     * Baked into the file rather than applied as a CSS filter, because
+     * assets/og/hero.jpg is cut from the same frame — a filter would leave
+     * every shared link in colour while the page was monochrome.
+     *
+     * Reproduce, or revert to colour by dropping --tone:
+     *   scripts/prepare-gallery-image.sh assets/originals/01-operating-alexa.jpg \
+     *     01-operating-alexa 0.5 0.35 --tone
+     */
     src: "/gallery/01-operating-alexa-1920.jpg",
     srcMobile: "/gallery/01-operating-alexa-1280.jpg",
     alt: "Angelia Hughes, in a wide-brimmed hat, operating a cinema camera on an exterior location.",
