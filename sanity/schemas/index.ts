@@ -35,6 +35,23 @@ const siteSettings = defineType({
       rows: 3,
     }),
     defineField({
+      name: "portrait",
+      title: "About photograph",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "The photo beside your bio. Set the hotspot on your face — the frame crops around it.",
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Alt text",
+          type: "string",
+          description: "Describe the photograph for screen readers.",
+          validation: (rule) => rule.required(),
+        }),
+      ],
+    }),
+    defineField({
       name: "bio",
       title: "Bio",
       type: "array",

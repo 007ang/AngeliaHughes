@@ -8,6 +8,7 @@ import {
 } from "@/sanity/queries";
 import {
   GALLERY,
+  PORTRAIT,
   SELECTED_CREDITS,
   SITE,
   WORK_VIDEOS,
@@ -19,6 +20,9 @@ import {
 
 export type SiteContent = {
   site: SiteSettings;
+  /** The About photograph. Separate from `site` because its Sanity shape is an
+   *  image object, not a settings field. */
+  portrait: GalleryImage;
   gallery: GalleryImage[];
   credits: SelectedCredit[];
   videos: WorkVideo[];
@@ -27,11 +31,25 @@ export type SiteContent = {
 
 const FALLBACK: SiteContent = {
   site: SITE,
+  portrait: PORTRAIT,
   gallery: GALLERY,
   credits: SELECTED_CREDITS,
   videos: WORK_VIDEOS,
   source: "fallback",
 };
+
+/** Deriving this from the builder's own source type does not work: that type is
+ *  a union including `string`, so intersecting it loses `asset`. Hotspot and
+ *  crop are carried through deliberately — the hotspot is how she keeps her
+ *  face in frame when the 4:5 crop bites. */
+type SanityPortrait = {
+  alt?: string;
+  asset: { _ref: string; _type: string };
+  hotspot?: { x: number; y: number; height: number; width: number };
+  crop?: { top: number; bottom: number; left: number; right: number };
+};
+
+type SanitySiteDoc = Partial<SiteSettings> & { portrait?: SanityPortrait };
 
 type SanityGalleryDoc = {
   _id: string;
@@ -52,16 +70,28 @@ export async function getSiteContent(): Promise<SiteContent> {
 
   try {
     const [site, gallery, credits, videos] = await Promise.all([
-      client.fetch<Partial<SiteSettings> | null>(siteSettingsQuery),
+      client.fetch<SanitySiteDoc | null>(siteSettingsQuery),
       client.fetch<SanityGalleryDoc[]>(galleryQuery),
       client.fetch<SelectedCredit[]>(selectedCreditsQuery),
       client.fetch<WorkVideo[]>(workVideosQuery),
     ]);
 
+    // Pulled out before the spread: its shape is a Sanity image object, not a
+    // SiteSettings field, so it must not land on `site`.
+    const { portrait, ...siteFields } = site ?? {};
+
     return {
       // Field-level merge: a blank field in the Studio falls back rather than
       // rendering an empty contact row.
-      site: { ...SITE, ...stripEmpty(site) },
+      site: { ...SITE, ...stripEmpty(siteFields) },
+      portrait: portrait?.asset
+        ? {
+            src: galleryUrl(portrait, 1920),
+            srcMobile: galleryUrl(portrait, 1280),
+            alt: portrait.alt ?? PORTRAIT.alt,
+            order: 1,
+          }
+        : PORTRAIT,
       gallery: gallery?.length
         ? gallery.map((doc, i) => ({
             _id: doc._id,

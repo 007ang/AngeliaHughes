@@ -1,7 +1,8 @@
 import { groq } from "next-sanity";
 
 export const siteSettingsQuery = groq`*[_type == "siteSettings"][0]{
-  name, shortName, roleLine, location, email, imdbUrl, linkedinUrl, seoDescription, bio
+  name, shortName, roleLine, location, email, imdbUrl, linkedinUrl, seoDescription, bio,
+  portrait
 }`;
 
 export const galleryQuery = groq`*[_type == "galleryImage"] | order(order asc){

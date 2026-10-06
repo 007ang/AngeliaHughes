@@ -7,13 +7,12 @@ import { Gallery } from "@/components/gallery/gallery";
 import { About } from "@/components/about";
 import { Work } from "@/components/work";
 import { getSiteContent } from "@/lib/data";
-import { PORTRAIT } from "@/lib/content";
 
 /** She edits in the Studio; the page picks it up within the minute. */
 export const revalidate = 60;
 
 export default async function Home() {
-  const { site, gallery, credits, videos } = await getSiteContent();
+  const { site, portrait, gallery, credits, videos } = await getSiteContent();
 
   const images = [...gallery].sort((a, b) => a.order - b.order);
 
@@ -38,7 +37,7 @@ export default async function Home() {
         <Gallery images={images} />
 
         <Section id="about" label="About">
-          <About site={site} portrait={PORTRAIT} />
+          <About site={site} portrait={portrait} />
         </Section>
 
         <Section id="work" label="Selected Work">

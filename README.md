@@ -201,33 +201,83 @@ community is small enough that the gap would be noticed.
 
 ---
 
-## Sanity
+## Sanity — so Angelia can edit it herself
 
-Deliberately thin: flat fields, no references, no derived computation. The bar
-is that she can change a caption or add an upcoming title without calling
-anyone. The page revalidates every 60s.
+The site reads from Sanity and falls back to the hardcoded content in
+`lib/content.ts`, so it is correct and complete whether or not the CMS exists.
+Everything below is about handing her the controls.
 
-**The project is to be created under Angelia's own email, not ours** — she
-should own the content her site runs on, and keeping the account in her name
-means nothing has to be transferred later.
+**The project must be created under her own email**, not ours — she should own
+the content her site runs on, and nothing then has to be transferred later.
 
-Set-up requires an interactive login, so these are steps to run:
+### Setup
+
+Creating a project needs an interactive browser login, so these are steps to
+run, not something that can be automated:
 
 ```bash
-npx sanity@latest login
+npx sanity@latest login          # sign in as Angelia
+npx sanity@latest projects create
 ```
 
-Create a project, then copy `.env.local.example` to `.env.local` and fill in
-`NEXT_PUBLIC_SANITY_PROJECT_ID`. Upload the masters from `assets/originals/`
-and **set a hotspot on her face in each** — the builder crops around the
-hotspot, and a centre crop cuts her head off.
+Copy `.env.local.example` to `.env.local` and fill in the project ID. Then add
+the same two variables in Vercel (Project → Settings → Environment Variables),
+or the deployed site will keep serving the fallback while localhost looks fine.
+
+### Seed it
+
+Do not hand her an empty Studio — that is the fastest way to end up with a CMS
+nobody uses. This imports everything the site currently ships: her bio and
+contact details, the About photograph, the four gallery frames and the six
+selected credits.
+
+```bash
+# sanity.io/manage → API → Tokens → add token, "Editor"
+SANITY_WRITE_TOKEN=xxx pnpm seed
+```
+
+Safe to re-run: every document uses a deterministic `_id` with
+`createOrReplace`, and Sanity dedupes uploaded images by content hash. It reads
+`lib/content.ts` directly rather than carrying its own copy, so the two cannot
+drift.
+
+### Give her access
+
+sanity.io/manage → Members → invite her as **Editor**. The Studio is at
+`/studio` on the live site — no separate install, and she can use it from a
+phone.
+
+### What she can change
+
+Site settings is a single pinned document, not a list: the site reads
+`*[_type == "siteSettings"][0]`, so a second one created by accident would win
+or lose at random, and the symptom would be "my edits aren't showing up"
+rather than anything she could diagnose. The Studio hides it from the "create
+new" menu for the same reason.
+
+| | |
+| --- | --- |
+| Site settings | name, role line, location, email, IMDb, LinkedIn, SEO description, bio, **About photograph** |
+| Photographs | the gallery frames — image, alt text, production name, order |
+| Selected credits | title, role, format, studio, episodes, year, order |
+| Work — videos | title, link, where, year, order — empty until she has a reel |
+
+Set a **hotspot** on each photograph. The frames crop to 16:9 and the About
+portrait to 4:5; the hotspot is what keeps her face in frame rather than
+cropped out.
+
+Edits appear on the live site within a minute (`revalidate = 60`).
+
+### If something looks wrong
+
+An empty Sanity result is treated as "not set up yet" and falls back to the
+hardcoded content — a half-provisioned CMS can never blank the page. The one
+exception is Work videos, where empty genuinely means "none yet". Fields are
+merged individually, so clearing one field in the Studio falls back for that
+field alone rather than wiping the section.
 
 > The globally installed `sanity` CLI is pinned to Node 18; this project needs
 > Node 22. Use `npx`, not the global binary.
-
-Until a project is connected, `lib/data.ts` serves the hardcoded content. An
-empty Sanity result is treated as "not set up yet" rather than "no credits", so
-a half-provisioned CMS can never blank the page during the festival.
 
 ---
 
