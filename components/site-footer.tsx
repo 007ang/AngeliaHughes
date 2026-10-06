@@ -19,7 +19,7 @@ export function SiteFooter({ site }: { site: SiteSettings }) {
           <div className="flex flex-col items-end gap-4">
             <SocialLinks site={site} />
             <p className="label text-bone/55">
-              {site.shortName} · {new Date().getFullYear()}
+              {site.shortName} © {new Date().getFullYear()}
             </p>
           </div>
         </div>

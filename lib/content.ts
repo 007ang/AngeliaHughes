@@ -60,7 +60,7 @@ export type SiteSettings = {
  */
 export const SITE: SiteSettings = {
   name: "Angelia Hughes",
-  shortName: "Angie Hughes",
+  shortName: "Angelia",
   roleLine: "Filmmaker",
   location: "Toronto",
   email: "Hughes.angelia@gmail.com",
@@ -90,8 +90,8 @@ export const SITE: SiteSettings = {
  * camera credits specifically \u2014 the directing reel she mentions in the bio
  * does not exist yet \u2014 so the section keeps that qualifier.
  *
- * Episode and season strings are normalised for typography only
- * ("Ep 3,4,5" \u2192 "Ep. 3, 4, 5"); no credit was altered.
+ * Verbatim, including her spacing and punctuation. Do not tidy these \u2014 the
+ * wording is hers to set.
  */
 export const SELECTED_CREDITS: SelectedCredit[] = [
   {
@@ -99,7 +99,7 @@ export const SELECTED_CREDITS: SelectedCredit[] = [
     role: "A Camera",
     format: "TV Series",
     studio: "Netflix",
-    episodes: "Ep. 1\u20138",
+    episodes: "Ep. 1-8",
     order: 1,
   },
   {
@@ -107,7 +107,7 @@ export const SELECTED_CREDITS: SelectedCredit[] = [
     role: "A Camera",
     format: "Mini Series",
     studio: "Netflix",
-    episodes: "Ep. 3, 4, 5",
+    episodes: "Ep 3,4,5",
     order: 2,
   },
   {
@@ -130,7 +130,7 @@ export const SELECTED_CREDITS: SelectedCredit[] = [
     role: "A Camera 2nd Unit / B Camera",
     format: "TV Series",
     studio: "Prime Video",
-    episodes: "S1, Ep. 1\u20138",
+    episodes: "S1 EP1-8",
     order: 5,
   },
   {
