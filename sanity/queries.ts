@@ -13,6 +13,10 @@ export const selectedCreditsQuery = groq`*[_type == "selectedCredit"] | order(or
   _id, title, role, format, studio, episodes, year, order
 }`;
 
+export const postersQuery = groq`*[_type == "poster"] | order(order asc){
+  _id, title, alt, order, image
+}`;
+
 export const workVideosQuery = groq`*[_type == "workVideo"] | order(order asc){
   _id, title, url, provider, year, order
 }`;

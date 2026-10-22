@@ -145,6 +145,41 @@ const selectedCredit = defineType({
   preview: { select: { title: "title", subtitle: "role" } },
 });
 
+const poster = defineType({
+  name: "poster",
+  title: "Poster",
+  type: "document",
+  fields: [
+    defineField({
+      name: "title",
+      title: "Production",
+      type: "string",
+      description: "Below, The Greatest, The Body, Cross, Suicide Squad.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "image",
+      title: "Poster artwork",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Portrait artwork. The frame is 2:3 — set the hotspot if the crop needs guiding.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "alt",
+      title: "Alt text",
+      type: "string",
+      description: 'e.g. "Poster for Below".',
+    }),
+    defineField({ name: "order", title: "Order", type: "number" }),
+  ],
+  orderings: [
+    { name: "orderAsc", title: "Order", by: [{ field: "order", direction: "asc" }] },
+  ],
+  preview: { select: { title: "title", media: "image" } },
+});
+
 const workVideo = defineType({
   name: "workVideo",
   title: "Work — video",
@@ -165,4 +200,4 @@ const workVideo = defineType({
   preview: { select: { title: "title", subtitle: "year" } },
 });
 
-export const schemaTypes = [siteSettings, galleryImage, selectedCredit, workVideo];
+export const schemaTypes = [siteSettings, galleryImage, selectedCredit, poster, workVideo];

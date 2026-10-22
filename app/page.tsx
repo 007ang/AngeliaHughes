@@ -12,7 +12,7 @@ import { getSiteContent } from "@/lib/data";
 export const revalidate = 60;
 
 export default async function Home() {
-  const { site, portrait, gallery, credits, videos } = await getSiteContent();
+  const { site, portrait, gallery, credits, posters, videos } = await getSiteContent();
 
   const images = [...gallery].sort((a, b) => a.order - b.order);
 
@@ -41,7 +41,7 @@ export default async function Home() {
         </Section>
 
         <Section id="work" label="Selected Work">
-          <Work credits={credits} videos={videos} />
+          <Work credits={credits} posters={posters} videos={videos} />
         </Section>
       </main>
 

@@ -1,7 +1,8 @@
 import { client } from "@/sanity/client";
-import { galleryUrl } from "@/sanity/image";
+import { galleryUrl, posterUrl } from "@/sanity/image";
 import {
   galleryQuery,
+  postersQuery,
   selectedCreditsQuery,
   siteSettingsQuery,
   workVideosQuery,
@@ -9,10 +10,12 @@ import {
 import {
   GALLERY,
   PORTRAIT,
+  POSTERS,
   SELECTED_CREDITS,
   SITE,
   WORK_VIDEOS,
   type GalleryImage,
+  type Poster,
   type SelectedCredit,
   type SiteSettings,
   type WorkVideo,
@@ -25,6 +28,7 @@ export type SiteContent = {
   portrait: GalleryImage;
   gallery: GalleryImage[];
   credits: SelectedCredit[];
+  posters: Poster[];
   videos: WorkVideo[];
   source: "sanity" | "fallback";
 };
@@ -34,6 +38,7 @@ const FALLBACK: SiteContent = {
   portrait: PORTRAIT,
   gallery: GALLERY,
   credits: SELECTED_CREDITS,
+  posters: POSTERS,
   videos: WORK_VIDEOS,
   source: "fallback",
 };
@@ -50,6 +55,14 @@ type SanityPortrait = {
 };
 
 type SanitySiteDoc = Partial<SiteSettings> & { portrait?: SanityPortrait };
+
+type SanityPosterDoc = {
+  _id: string;
+  title: string;
+  alt?: string;
+  order?: number;
+  image: Parameters<typeof posterUrl>[0];
+};
 
 type SanityGalleryDoc = {
   _id: string;
@@ -69,10 +82,11 @@ export async function getSiteContent(): Promise<SiteContent> {
   if (!client) return FALLBACK;
 
   try {
-    const [site, gallery, credits, videos] = await Promise.all([
+    const [site, gallery, credits, posters, videos] = await Promise.all([
       client.fetch<SanitySiteDoc | null>(siteSettingsQuery),
       client.fetch<SanityGalleryDoc[]>(galleryQuery),
       client.fetch<SelectedCredit[]>(selectedCreditsQuery),
+      client.fetch<SanityPosterDoc[]>(postersQuery),
       client.fetch<WorkVideo[]>(workVideosQuery),
     ]);
 
@@ -103,6 +117,14 @@ export async function getSiteContent(): Promise<SiteContent> {
           }))
         : FALLBACK.gallery,
       credits: credits?.length ? credits : FALLBACK.credits,
+      // Like videos, empty means "none uploaded yet", not "CMS not set up".
+      posters: (posters ?? []).map((doc, i) => ({
+        _id: doc._id,
+        title: doc.title,
+        src: posterUrl(doc.image, 800),
+        alt: doc.alt ?? `Poster for ${doc.title}`,
+        order: doc.order ?? i + 1,
+      })),
       // Videos are genuinely empty until she sends links — an empty result here
       // means "none yet", not "CMS not set up", so it must not fall back.
       videos: videos ?? [],

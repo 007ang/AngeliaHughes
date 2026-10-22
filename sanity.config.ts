@@ -45,6 +45,7 @@ export default defineConfig({
             S.divider(),
             S.documentTypeListItem("galleryImage").title("Photographs"),
             S.documentTypeListItem("selectedCredit").title("Selected credits"),
+            S.documentTypeListItem("poster").title("Posters"),
             S.documentTypeListItem("workVideo").title("Work — videos"),
           ]),
     }),

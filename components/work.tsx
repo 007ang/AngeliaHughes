@@ -1,4 +1,4 @@
-import type { SelectedCredit, WorkVideo } from "@/lib/content";
+import type { Poster, SelectedCredit, WorkVideo } from "@/lib/content";
 
 /**
  * Selected credits, written out rather than tabulated — a table of these reads
@@ -11,9 +11,11 @@ import type { SelectedCredit, WorkVideo } from "@/lib/content";
  */
 export function Work({
   credits,
+  posters,
   videos,
 }: {
   credits: SelectedCredit[];
+  posters: Poster[];
   videos: WorkVideo[];
 }) {
   return (
@@ -60,6 +62,54 @@ export function Work({
           </li>
         ))}
       </ul>
+
+      {posters.length > 0 && (
+        <>
+          <h3 className="label mt-16 mb-6 text-bone/55">Posters</h3>
+
+          {/*
+            A shelf rather than a grid. Five portrait posters do not divide
+            cleanly into two or three columns, and a grid leaves an orphan on
+            the last row at most widths. Horizontal scroll holds any count and
+            reads like posters on a wall.
+
+            overflow-x here is a descendant scroll container, not an ancestor
+            of the pinned gallery, so it cannot interfere with the pin.
+
+            scroll-pl-6 matches the page gutter the -mx-6/px-6 bleed restores.
+            Without it the snapport starts at the padding box, so mandatory
+            snapping parks the first poster flush against the screen edge,
+            24px out of line with the heading and every other element.
+
+            40vw rather than a width that divides the screen evenly: two
+            posters plus a sliver of the third, so the row visibly continues
+            past the frame. A shelf that ends flush at the edge reads as a
+            complete set and nobody swipes it.
+          */}
+          <ul className="-mx-6 flex snap-x snap-mandatory scroll-pl-6 gap-4 overflow-x-auto px-6 pb-2 md:mx-0 md:scroll-pl-0 md:gap-6 md:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {posters.map((poster) => (
+              <li
+                key={poster._id ?? poster.title}
+                className="w-[40vw] shrink-0 snap-start sm:w-[28vw] md:w-auto md:flex-1"
+              >
+                <div className="aspect-[2/3] w-full overflow-hidden bg-bone/9">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={poster.src}
+                    alt={poster.alt}
+                    width={800}
+                    height={1200}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <p className="label mt-3 text-bone/55">{poster.title}</p>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }

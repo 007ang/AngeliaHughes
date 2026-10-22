@@ -31,6 +31,15 @@ export type WorkVideo = {
   order: number;
 };
 
+export type Poster = {
+  _id?: string;
+  /** The production the poster is for. */
+  title: string;
+  src: string;
+  alt: string;
+  order: number;
+};
+
 export type GalleryImage = {
   _id?: string;
   src: string;
@@ -141,6 +150,17 @@ export const SELECTED_CREDITS: SelectedCredit[] = [
     order: 6,
   },
 ];
+
+/**
+ * Posters sit below the credits, and are their own set rather than artwork
+ * attached to each credit — she asked for five, only four of which are
+ * credits, so the two lists move independently.
+ *
+ * Empty until the artwork is uploaded in the Studio. These are the studios'
+ * copyrighted promotional images, so they are hers to supply rather than ours
+ * to go and fetch.
+ */
+export const POSTERS: Poster[] = [];
 
 /**
  * Still empty, and now we know why: her bio says she is "building her Director
